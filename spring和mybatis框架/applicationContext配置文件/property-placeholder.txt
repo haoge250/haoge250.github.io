@@ -1,0 +1,94 @@
+<!-- 引入jdbc配置文件 -->
+<context:property-placeholder location="classpath:jdbc.properties"/>
+语法：<context:property-placeholder location="classpath*:xxxx.properties"/> （加*与不加*有区别）
+1.先拿到要替换的值（即：${xx}中的xx)
+2.递归解析，拿到真正要替换的值（即有可能是${${}/xx}这样的）
+3.调用placeholderResolver的resolvePlaceholder方法拿到属性值（其实就会调用上面传递的getPropertyAsRawString方法）
+4.如果属性值为空，可能是有默认值分隔符（即有：）,一番处理后拿到属性值
+5.对属性值进行递归解析，拿到最终属性值（即可能是在属性文件中写法：xxx=${xxx},一般是多个属性文件的情况）
+6.最终属性值不为空就替换，否则根据       ignoreUnresolvablePlaceholders判断是否抛异常还是继续解析
+7.把解析成功的要替换的值从visitedPlaceholders中移除
+8.继续循环或返回结果
+
+<context:property-placeholder>标签提供了一种优雅的外在化参数配置的方式，不过该标签在Spring配置文件中只能存在一份！！
+
+有一种方案可以方便我们在一个阶段内不需要频繁写一个参数的值，而在不同阶段间又可以方便的切换参数的配置信息 
+解决：spring3中提供了一种简便的方式就是<content:property-placeholder>元素 
+只需要在spring配置文件中添加一句：
+<context:property-placeholder location="classpath:jdbc.properties"/> （一般用这个吧）
+或者
+<bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+        <list>
+            <value>jdbc.properties<value/>
+        </list>
+    </property>
+</bean>
+即可，这里的location值为参数配置文件的位置，配置文件通常放到src目录下，
+参数配置文件的格式即键值对的形式：
+jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/energycar
+jdbc.username=root
+jdbc.password=123456
+这样一来就可以为spring配置的bean的属性设置值了，比如spring有一个数据源的类
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+</bean>
+甚至可以将 ${} 这种形式的变量用在spring提供的注解当中，为注解的属性提供值。
+
+Spring容器采用反射扫描的发现机制。
+
+********************如果要研究<context:property-placeholder>标签********************
+打开spring-context-4.2.2.RELEASE.jar下的META-INF的spring.handlers,里面有：
+http\://www.springframework.org/schema/context=org.springframework.context.config.ContextNamespaceHandler
+所以点开org.springframework.context.config下的ContextNamespaceHandler.class。
+源码如下：
+/*
+ * Copyright 2002-2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.context.config;
+
+import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.context.annotation.AnnotationConfigBeanDefinitionParser;
+import org.springframework.context.annotation.ComponentScanBeanDefinitionParser;
+
+/**
+ * {@link org.springframework.beans.factory.xml.NamespaceHandler}
+ * for the '{@code context}' namespace.
+ *
+ * @author Mark Fisher
+ * @author Juergen Hoeller
+ * @since 2.5
+ */
+public class ContextNamespaceHandler extends NamespaceHandlerSupport {
+
+	@Override
+	public void init() {
+		registerBeanDefinitionParser("property-placeholder", new PropertyPlaceholderBeanDefinitionParser());
+		registerBeanDefinitionParser("property-override", new PropertyOverrideBeanDefinitionParser());
+		registerBeanDefinitionParser("annotation-config", new AnnotationConfigBeanDefinitionParser());
+		registerBeanDefinitionParser("component-scan", new ComponentScanBeanDefinitionParser());
+		registerBeanDefinitionParser("load-time-weaver", new LoadTimeWeaverBeanDefinitionParser());
+		registerBeanDefinitionParser("spring-configured", new SpringConfiguredBeanDefinitionParser());
+		registerBeanDefinitionParser("mbean-export", new MBeanExportBeanDefinitionParser());
+		registerBeanDefinitionParser("mbean-server", new MBeanServerBeanDefinitionParser());
+	}
+
+}
+
