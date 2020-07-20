@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+1.xmlns:全名是xml namespace,即是为当前的这个xml指定命名空间。
+如：xmlns="http://www.springframework.org/schema/beans"
+2.xmlns:xsi是指当前xml所要遵循的标签规范。
+如：xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+3.如何使用xmlns：使用语法 xmlns:namespace-prefix="namespaceURI"。
+（1）namespace-prefix为自定义前缀，只要在这个XML文档中保证前缀不重复即可。
+（2）namespaceURI是这个前缀对应的XML Namespace的定义。
+如：xmlns:context="http://www.springframework.org/schema/context"
+4.schemaLocation提供了一个xml namespace到对应的XSD文件的一个映射，所以我们可以看到，
+在xsi:schemaLocation后面配置的字符串都是成对的，前面的是namespace的URI，后面是xsd文件的URI。
+如：xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+5.Spring默认在启动时是要加载XSD文件来验证xml文件的，所以如果有的时候断网了，或者一些开源软件切换域名，
+那么就很容易碰到应用启动不了。为了防止这种情况，Spring提供了一种机制，默认从本地加载XSD文件。
+打开spring-context-3.2.0.RELEASE.jar，可以看到里面有两个特别的文件：spring.handlers、spring.schemas。
+再打开jar包里的org/springframework/context/config/ 目录，可以看到下面有
+spring-context-2.5.xsd
+spring-context-3.0.xsd
+spring-context-3.1.xsd
+spring-context-3.2.xsd
+很明显，可以想到Spring是把XSD文件放到本地了，再在spring.schemas里做了一个映射，优先从本地里加载XSD文件。
+并且Spring很贴心，把旧版本的XSD文件也全放了。这样可以防止升级了Spring版本，而配置文件里用的还是旧版本的XSD文件，
+然后断网了，应用启动不了。我们还可以看到，在没有配置版本号时，用的就是当前版本的XSD文件：
