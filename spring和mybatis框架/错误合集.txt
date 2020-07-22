@@ -1,0 +1,19 @@
+错误：1
+Caused by: org.springframework.beans.factory.BeanDefinitionStoreException: Unexpected exception parsing XML document
+ from class path resource [applicationContext.xml]; nested exception is java.lang.NoClassDefFoundError: 
+ org/springframework/aop/TargetSource
+ 原因：
+spring-aop-4.3.10.RELEASE 包未导入（这里注意，须要导入相对应的版本jar包，否则可能会报错）；
+
+错误：2
+org.springframework.beans.factory.CannotLoadBeanClassException: Cannot find class 
+[org.apache.commons.dbcp.BasicDataSource] for bean with name 'dataSource' defined in class path resource 
+[applicationContext.xml]; nested exception is java.lang.ClassNotFoundException: 
+org.apache.commons.dbcp.BasicDataSource
+原因：
+commons-dbcp-1.2.2.jar包未导入。
+
+错误：3
+java.lang.NoClassDefFoundError: org/apache/commons/pool/impl/GenericObjectPool
+原因：
+commons-pool-1.4.jar包未导入。
