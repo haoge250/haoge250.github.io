@@ -1,0 +1,51 @@
+1、@Controller
+在SpringMVC 中，控制器Controller 负责处理由DispatcherServlet 分发的请求，它把用户请求的数据经过业务处理层处理之后封装成
+一个Model ，然后再把该Model 返回给对应的View 进行展示。在SpringMVC 中提供了一个非常简便的定义Controller 的方法，你无需
+继承特定的类或实现特定的接口，只需使用@Controller 标记一个类是Controller ，然后使用@RequestMapping 和@RequestParam 等一
+些注解用以定义URL 请求和Controller 方法之间的映射，这样的Controller 就能被外界访问到。此外Controller 不会直接依赖于Http
+ServletRequest 和HttpServletResponse 等HttpServlet 对象，它们可以通过Controller 的方法参数灵活的获取到。
+@Controller 用于标记在一个类上，使用它标记的类就是一个SpringMVC Controller 对象。分发处理器将会扫描使用了该注解的类的方
+法，并检测该方法是否使用了@RequestMapping 注解。@Controller 只是定义了一个控制器类，而使用@RequestMapping 注解的方法才
+是真正处理请求的处理器。单单使用@Controller 标记在一个类上还不能真正意义上的说它就是SpringMVC 的一个控制器类，因为这个
+时候Spring 还不认识它。那么要如何做Spring 才能认识它呢？这个时候就需要我们把这个控制器类交给Spring 来管理。有两种方式：
+（1）在SpringMVC 的配置文件中定义MyController 的bean 对象。
+（2）在SpringMVC 的配置文件中告诉Spring 该到哪里去找标记为@Controller 的Controller 控制器。
+<!--方式一-->
+<bean class="com.host.app.web.controller.MyController"/>
+<!--方式二-->
+< context:component-scan base-package = "com.host.app.web" />
+
+在springmvc.xml配置文件中
+<!-- 扫描器 -->
+<context:component-scan base-package="com.etc.controller"></context:component-scan>
+
+2、@RequestMapping
+RequestMapping是一个用来处理请求地址映射的注解，可用于类或方法上。用于类上，表示类中的所有响应请求的方法都是以该地址
+作为父路径。
+RequestMapping注解有六个属性，分成三类进行说明（下面有相应示例）。
+1、 value， method；
+value：     指定请求的实际地址，指定的地址可以是URI Template 模式（后面将会说明）；
+method：  指定请求的method类型， GET、POST、PUT、DELETE等；
+2、consumes，produces
+consumes： 指定处理请求的提交内容类型（Content-Type），例如application/json, text/html;
+produces:    指定返回的内容类型，仅当request请求头中的(Accept)类型中包含该指定类型才返回；
+3、params，headers
+params： 指定request中必须包含某些参数值是，才让该方法处理。
+headers： 指定request中必须包含某些指定的header值，才能让该方法处理请求。
+如：
+@Controller
+@RequestMapping("/energy")
+public class IndexController {
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public ModelAndView index(HttpServletRequest request,HttpServletResponse response,ModelMap model) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("index");
+		return mav;
+	}
+}
+
+3、@ResponseBody
+作用： 该注解用于将Controller的方法返回的对象，通过适当的HttpMessageConverter转换为指定格式后，写入到Response
+对象的body数据区。
+
+转：https://blog.csdn.net/qq_32939679/article/details/80716583
