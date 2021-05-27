@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间可以使用全限定名，也可以短名称 例如：namespace="UserMapper", -->
+<mapper namespace="com.etc.entity.UserMapper"> 
+    <!-- <resultMap id="default" type="com.etc.entity.User">
+        <id column="uid" property="uid"/>
+        <result column="uname" property="uname"/>
+        <result column="password" property="password"/>
+    </resultMap> -->
+    <select id="selectUser"  resultType="com.etc.entity.User">
+        select * from user where id = #{id}
+    </select>
+    <insert id="insertUser" parameterType="com.etc.entity.User">
+    	insert into user values (#{id},#{account},#{password},#{power})
+    </insert>
+    <!-- <insert id="insert" parameterType="com.etc.entity.User">
+        insert into user values (#{uid},#{uname},#{password})
+    </insert>
+    <update id="update" parameterType="com.etc.entity.User">
+        update user set uname=#{uname},password={#password} where uid=#{uid}
+    </update>
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from user where uid=#{uid}
+    </delete>
+    <select id="select" resultMap="default">
+        select * from user
+    </select> -->
+</mapper>
